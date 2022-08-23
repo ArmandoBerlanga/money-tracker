@@ -1,8 +1,5 @@
 <script setup>
-let toggleTheme = () => {
-    document.body.classList.toggle('body--dark');
-    document.body.classList.toggle('body--light');
-};
+let toggleTheme = () => document.body.classList.toggle('body--dark');
 </script>
 
 <template>
@@ -12,11 +9,7 @@ let toggleTheme = () => {
         <h5 class="text-primary text-bold">Configuración</h5>
     </div>
 
-    <div class="add-category container">
-
-    </div>
-
-    <div class="converter container">
+    <div class="container">
 
     </div>
 
@@ -28,4 +21,3 @@ let toggleTheme = () => {
     </q-page-sticky>
 </q-page>
 </template>
-

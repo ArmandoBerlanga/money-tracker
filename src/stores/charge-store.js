@@ -10,5 +10,8 @@ export const useChargeStore = defineStore('chaarges', {
     set(input) {
       this.charges = input;
     },
+    addOne(input) {
+      this.charges.push(input);
+    }
   },
 });

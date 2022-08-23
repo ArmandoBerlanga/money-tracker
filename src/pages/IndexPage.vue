@@ -1,6 +1,5 @@
 <script setup>
 import { db } from 'boot/firebase';
-import { useQuasar } from 'quasar';
 import AddSpent from 'components/AddSpent.vue';
 import PieChart from 'components/charts/PieChart.vue';
 import BarChart from 'components/charts/BarChart.vue';
@@ -8,7 +7,6 @@ import { nextTick, reactive } from '@vue/runtime-core';
 import { useChargeStore } from 'stores/charge-store.js';
 import { useCategorieStore } from 'stores/categorie-store.js';
 
-const $q = useQuasar();
 const chargesStore = useChargeStore();
 const categoriesStore = useCategorieStore();
 
@@ -34,7 +32,6 @@ const forceRerender = async () => {
 
 let toggleTheme = () => {
     document.body.classList.toggle('body--dark');
-    document.body.classList.toggle('body--light');
     forceRerender();
 };
 
@@ -147,6 +144,13 @@ let addToTotal = payload => {
             data: series
         });
     }
+
+    chargesStore.addOne({
+        chargeID: '',
+        amount: payload.amount,
+        categoryID: payload.categoryID,
+        date: new Date().getTime()
+    });
 };
 
 // --
@@ -184,6 +188,7 @@ getCharges();
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
             <q-fab-action color="grey" to="/settings" icon="settings" />
+            <q-fab-action color="grey" to="/records" icon="manage_search" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
         </q-fab>
     </q-page-sticky>
