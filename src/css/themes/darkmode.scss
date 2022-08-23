@@ -1,0 +1,37 @@
+$dk-escala-1: rgb(21, 21, 21);
+$dk-escala-2: rgb(37, 37, 37);
+$dk-escala-3: rgb(54, 54, 54);
+.dark-theme {
+    color: white;
+    background-color: $dk-escala-1;
+    * {
+        color: inherit;
+    }
+    input,
+    .q-checkbox__svg {
+        color: white;
+    }
+    .q-chip,
+    .q-item {
+        background-color: $dk-escala-2;
+    }
+    .container,
+    .q-card {
+        background-color: $dk-escala-2 !important;
+    }
+    .q-menu,
+    .q-card .q-field__control,
+    .regular-form .q-field__control {
+        background-color: $dk-escala-3 !important;
+    }
+    .q-drawer__content {
+        background-color: $dk-escala-2 !important;
+        .q-item {
+            background-color: inherit;
+        }
+        .q-item__label--header,
+        .q-item__label--caption {
+            color: inherit;
+        }
+    }
+}

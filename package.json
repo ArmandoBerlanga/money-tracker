@@ -1,0 +1,45 @@
+{
+  "name": "money-tracker",
+  "version": "0.0.1",
+  "description": "App to track money expenses",
+  "productName": "MoneyTrackerApp",
+  "author": "Armando Berlanga <Jose.berlangam@udem.edu>",
+  "private": true,
+  "scripts": {
+    "icons": "icongenie generate -i icon.png --skip-trim"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.0.0",
+    "@vueuse/firebase": "^9.1.0",
+    "axios": "^0.21.1",
+    "cordova": "^11.0.0",
+    "cordova-ios": "^6.2.0",
+    "core-js": "^3.6.5",
+    "firebase": "^9.9.3",
+    "pinia": "^2.0.11",
+    "quasar": "^2.6.0",
+    "v-money": "^0.8.1",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0",
+    "vue3-apexcharts": "^1.4.1"
+  },
+  "devDependencies": {
+    "@quasar/app-webpack": "^3.0.0"
+  },
+  "browserslist": [
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 12.22.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
