@@ -16,7 +16,8 @@ const state = reactive({
     pieSeries:[],
     barSeries: [],
     totalSpent: 0,
-    renderCharts: true
+    renderCharts: true,
+    noData: true
 });
 
 let formatter = number => '€' + Number(parseFloat(number).toFixed(2)).toLocaleString("es-MX", {
@@ -75,6 +76,7 @@ let getCharges = async () =>{
         state.charges = chargesStore.charges;
 
     state.totalSpent = state.charges.reduce((acc, cur) => acc + cur.amount, 0);
+    state.noData = state.totalSpent == 0;
 
     // Manipulación de datos para el gráfico de PIE
     state.charges.forEach(charge => {
@@ -119,6 +121,7 @@ let getCharges = async () =>{
 }
 
 let addToTotal = payload => {
+    state.noData = false;
     payload.amount = parseFloat(payload.amount);
     state.totalSpent += payload.amount;
 
@@ -155,19 +158,24 @@ getCharges();
         <AddSpent @add="addToTotal"/>
     </div>
 
-    <div class="indicador container" v-if="true">
+    <div class="indicador container">
         <div class="title text-primary">Gasto total</div>
         <div class="cantidad">{{ formatter(state.totalSpent) }}</div>
     </div>
 
-    <div class="chart container prevent-selection">
+    <div class="chart container prevent-selection" v-if="!state.noData">
         <h5 class="text-primary text-bold">Mes actual</h5>
         <PieChart uid="pie" :series="state.pieSeries" :formatter="formatter" v-if="state.renderCharts" />
     </div>
 
-    <div class="chart container prevent-selection">
+    <div class="chart container prevent-selection" v-if="!state.noData">
         <h5 class="text-primary text-bold">Desglose mensual</h5>
         <BarChart uid="bar" :series="state.barSeries" :formatter="formatter" v-if="state.renderCharts" />
+    </div>
+
+    <div class="no-data container flex flex-center column q-gutter-y-sm" v-if="state.noData">
+        <q-icon name="sentiment_dissatisfied" size="4rem" color="primary"/>
+        <h5 class="text-primary q-pb-md">No has registrado ningun gasto</h5>
     </div>
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">

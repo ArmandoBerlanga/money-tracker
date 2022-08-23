@@ -1,7 +1,10 @@
 <script setup>
-import { db } from 'boot/firebase';
 import { VMoney } from 'v-money';
+import { db } from 'boot/firebase';
+import { useQuasar } from 'quasar';
 import { ref } from '@vue/runtime-core';
+
+const $q = useQuasar();
 
 const emit = defineEmits(['add'])
 
@@ -30,11 +33,23 @@ let getCategories = async () => {
 }
 
 let addSpent = async () => {
-    if(category.value == null)
+    if(category.value == null) {
+        $q.notify({
+            message: 'Selecciona una categoría',
+            color: 'negative',
+            icon: 'warning'
+        });
         return;
+    }
 
-    if(price.value == 0)
+    if(price.value <= 0) {
+        $q.notify({
+            message: 'El precio debe ser mayor que 0',
+            color: 'negative',
+            icon: 'warning'
+        });
         return;
+    }
 
     const response = await db.collection('Charges').add({
         Amount: parseFloat(price.value),
@@ -49,6 +64,12 @@ let addSpent = async () => {
 
     price.value = 0;
     category.value = null;
+
+    $q.notify({
+        message: 'Gasto agregado',
+        color: 'positive',
+        icon: 'check'
+    });
 }
 
 getCategories();
