@@ -2,7 +2,7 @@
 let toggleTheme = () => {
     document.body.classList.toggle('body--dark');
     document.body.classList.toggle('body--light');
-}
+};
 </script>
 
 <template>
@@ -16,9 +16,13 @@ let toggleTheme = () => {
 
     </div>
 
+    <div class="converter container">
+
+    </div>
+
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
-            <q-fab-action color="grey" @click="this.$router.push('/')" icon="home" />
+            <q-fab-action color="grey" to="/" icon="home" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
         </q-fab>
     </q-page-sticky>

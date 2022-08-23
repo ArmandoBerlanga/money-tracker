@@ -183,7 +183,7 @@ getCharges();
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
-            <q-fab-action color="grey" @click="this.$router.push('/settings')" icon="settings" />
+            <q-fab-action color="grey" to="/settings" icon="settings" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
         </q-fab>
     </q-page-sticky>

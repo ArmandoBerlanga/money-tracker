@@ -1,11 +1,13 @@
 <template>
 <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-        <q-toolbar>
-            <q-toolbar-title class="flex flex-center home" @click="this.$router.push('/')">
-                <img src="~assets/icon.png" alt="main-icon" style="width:50px;">
-                <div id="title" class="text-bold text-italic">Money Tracker</div>
-            </q-toolbar-title>
+        <q-toolbar class="flex flex-center">
+            <router-link to="/" class="no-link">
+                <q-toolbar-title class="flex flex-center home">
+                    <img src="~assets/icon.png" alt="main-icon" style="width:50px;">
+                    <div id="title" class="text-bold text-italic">Money Tracker</div>
+                </q-toolbar-title>
+            </router-link>
         </q-toolbar>
     </q-header>
 
@@ -18,8 +20,13 @@
 </template>
 
 <style lang="scss" scoped>
-.home:active{
+.home:active {
     transition: all 0.3s ease-in-out;
     transform: scale(1.1);
+}
+
+.no-link{
+    text-decoration: none;
+    color: inherit;
 }
 </style>
