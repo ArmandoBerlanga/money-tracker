@@ -172,7 +172,7 @@ getCharges();
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
-            <q-fab-action color="grey" icon="settings" />
+            <q-fab-action color="grey" @click="this.$router.push('/settings')" icon="settings" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
         </q-fab>
     </q-page-sticky>
@@ -180,18 +180,6 @@ getCharges();
 </template>
 
 <style lang="scss" scoped>
-h5 {
-    margin: 0;
-    padding: 0;
-    font-size: 1.2rem;
-}
-
-.container {
-    background-color: #f4f4f9;
-    border-radius: 0.5rem;
-    padding: 0.7rem;
-}
-
 .indicador {
     display: flex;
     justify-content: space-between;

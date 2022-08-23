@@ -69,7 +69,7 @@ export default {
             },
             yaxis: {
                 labels: {
-                    formatter: val => "€" + val
+                    formatter: val => "€" + val.toFixed(0),
                 }
             },
             tooltip: {
