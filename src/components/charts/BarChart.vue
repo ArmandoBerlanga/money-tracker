@@ -85,7 +85,7 @@ export default {
         });
 
         onMounted(() => {
-            state.options.theme.mode = document.body.classList.contains('dark-theme') || localStorage.getItem('tema') == 1 ? 'dark' : 'light';
+            state.options.theme.mode = document.body.classList.contains('body--dark') || localStorage.getItem('tema') == 1 ? 'dark' : 'light';
         })
 
         return {

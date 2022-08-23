@@ -10,7 +10,9 @@
     </q-header>
 
     <q-page-container>
-        <router-view />
+        <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" appear :duration="3000">
+            <router-view />
+        </transition>
     </q-page-container>
 </q-layout>
 </template>

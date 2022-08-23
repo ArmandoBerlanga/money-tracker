@@ -79,7 +79,7 @@ export default {
         });
 
         onMounted(async () => {
-            state.options.theme.mode = document.body.classList.contains('dark-theme') || localStorage.getItem('tema') == 1 ? 'dark' : 'light';
+            state.options.theme.mode = document.body.classList.contains('body--dark') || localStorage.getItem('tema') == 1 ? 'dark' : 'light';
 
             if(categoriesStore.categories.length != 0)
                 state.options.labels = categoriesStore.getDescriptions;

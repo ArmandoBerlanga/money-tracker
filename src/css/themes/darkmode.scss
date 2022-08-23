@@ -1,9 +1,11 @@
 $dk-escala-1: rgb(21, 21, 21);
 $dk-escala-2: rgb(37, 37, 37);
 $dk-escala-3: rgb(54, 54, 54);
-.dark-theme {
-    color: white;
+body.body--dark {
     background-color: $dk-escala-1;
+}
+.body--dark {
+    color: white;
     * {
         color: inherit;
     }

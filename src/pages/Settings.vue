@@ -1,5 +1,8 @@
 <script setup>
-let toggleTheme = () => document.body.classList.toggle('dark-theme');
+let toggleTheme = () => {
+    document.body.classList.toggle('body--dark');
+    document.body.classList.toggle('body--light');
+}
 </script>
 
 <template>

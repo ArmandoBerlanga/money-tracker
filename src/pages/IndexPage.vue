@@ -1,5 +1,6 @@
 <script setup>
 import { db } from 'boot/firebase';
+import { useQuasar } from 'quasar';
 import AddSpent from 'components/AddSpent.vue';
 import PieChart from 'components/charts/PieChart.vue';
 import BarChart from 'components/charts/BarChart.vue';
@@ -7,6 +8,7 @@ import { nextTick, reactive } from '@vue/runtime-core';
 import { useChargeStore } from 'stores/charge-store.js';
 import { useCategorieStore } from 'stores/categorie-store.js';
 
+const $q = useQuasar();
 const chargesStore = useChargeStore();
 const categoriesStore = useCategorieStore();
 
@@ -31,7 +33,8 @@ const forceRerender = async () => {
 };
 
 let toggleTheme = () => {
-    document.body.classList.toggle('dark-theme')
+    document.body.classList.toggle('body--dark');
+    document.body.classList.toggle('body--light');
     forceRerender();
 };
 
