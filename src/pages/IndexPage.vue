@@ -4,6 +4,11 @@ import AddSpent from 'components/AddSpent.vue';
 import PieChart from 'components/charts/PieChart.vue';
 import BarChart from 'components/charts/BarChart.vue';
 import { nextTick, reactive } from '@vue/runtime-core';
+import { useChargeStore } from 'stores/charge-store.js';
+import { useCategorieStore } from 'stores/categorie-store.js';
+
+const chargesStore = useChargeStore();
+const categoriesStore = useCategorieStore();
 
 const state = reactive({
     categories: [],
@@ -30,27 +35,46 @@ let toggleTheme = () => {
 };
 
 let getCategories = async () => {
-    const response = await db.collection('Categories').get()
-    response.forEach(doc => {
-        state.categories.push({
-            description: doc.data().Description,
-            categoryID: doc.id,
-            total: 0
+
+    if(categoriesStore.categories.length != 0){
+        state.categories = categoriesStore.categories;
+        return;
+    }
+
+    await db.collection('Categories').get()
+        .then(response => {
+            response.forEach(doc => {
+                state.categories.push({
+                    description: doc.data().Description,
+                    categoryID: doc.id,
+                    total: 0
+                })
+            });
+
+            categoriesStore.set(state.categories);
         })
-    })
 }
 
 let getCharges = async () =>{
-    const response = await db.collection('Charges').get()
-    response.forEach(doc => {
-        state.totalSpent += doc.data().Amount;
-        state.charges.push({
-            chargeID: doc.id,
-            amount: doc.data().Amount,
-            categoryID: doc.data().CategoryID,
-            date: doc.data().Date.seconds * 1000,
-        })
-    });
+
+    if(chargesStore.charges.length == 0)
+        await db.collection('Charges').get()
+            .then(response => {
+                response.forEach(doc => {
+                    state.charges.push({
+                        chargeID: doc.id,
+                        amount: doc.data().Amount,
+                        categoryID: doc.data().CategoryID,
+                        date: doc.data().Date.seconds * 1000,
+                    })
+                });
+
+                chargesStore.set(state.charges);
+            });
+    else
+        state.charges = chargesStore.charges;
+
+    state.totalSpent = state.charges.reduce((acc, cur) => acc + cur.amount, 0);
 
     // Manipulación de datos para el gráfico de PIE
     state.charges.forEach(charge => {

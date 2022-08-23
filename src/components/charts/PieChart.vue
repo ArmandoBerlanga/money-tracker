@@ -16,6 +16,7 @@
 <script>
 import { db } from 'boot/firebase';
 import { reactive, onMounted } from '@vue/runtime-core';
+import { useCategorieStore } from 'stores/categorie-store.js';
 
 export default {
     name: 'PieChart',
@@ -70,6 +71,8 @@ export default {
             },
         };
 
+        const categoriesStore = useCategorieStore();
+
         const state = reactive({
             carga: true,
             options
@@ -78,8 +81,12 @@ export default {
         onMounted(async () => {
             state.options.theme.mode = document.body.classList.contains('dark-theme') || localStorage.getItem('tema') == 1 ? 'dark' : 'light';
 
-            const response = await db.collection('Categories').get();
-            response.forEach(doc => state.options.labels.push(doc.data().Description));
+            if(categoriesStore.categories.length != 0)
+                state.options.labels = categoriesStore.getDescriptions;
+            else {
+                const response = await db.collection('Categories').get();
+                response.forEach(doc => state.options.labels.push(doc.data().Description));
+            }
         })
 
         return {
