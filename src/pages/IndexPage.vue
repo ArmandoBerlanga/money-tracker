@@ -159,7 +159,7 @@ getCharges();
     </div>
 
     <div class="indicador container">
-        <div class="title text-primary">Gasto total</div>
+        <div class="title text-primary prevent-selection">Gasto total</div>
         <div class="cantidad">{{ formatter(state.totalSpent) }}</div>
     </div>
 
@@ -173,7 +173,7 @@ getCharges();
         <BarChart uid="bar" :series="state.barSeries" :formatter="formatter" v-if="state.renderCharts" />
     </div>
 
-    <div class="no-data container flex flex-center column q-gutter-y-sm" v-if="state.noData">
+    <div class="no-data container flex flex-center column q-gutter-y-sm prevent-selection" v-if="state.noData">
         <q-icon name="sentiment_dissatisfied" size="4rem" color="primary"/>
         <h5 class="text-primary q-pb-md">No has registrado ningun gasto</h5>
     </div>
