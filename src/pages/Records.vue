@@ -55,7 +55,7 @@ let getCharges = async () => {
 }
 
 let toggleTheme = () => document.body.classList.toggle('body--dark');
-let formatter = date => new Date(date).toLocaleString('es-MX', { hour12: false }).replace(',', '').substring(0, 15);
+let formatter = date => new Date(date).toLocaleString('es-MX', { hour12: false }).replace(',', '').substring(0, 14);
 let findCategory = id => categories.value.find(category => category.categoryID == id).description;
 
 getCategories();
