@@ -10,22 +10,25 @@
                 v-model="state.charge.date"
                 type="date"
                 label="Fecha"
-                maxlength="40"
-            />
+                maxlength="10" />
 
-            <q-input
+            <q-select
                 filled
+                emit-value
+                map-options
                 v-model="state.charge.categoryID"
-                label="Categoria"
-                maxlength="40"
-            />
+                :options="state.categories"
+                label="Categoría" />
 
-            <q-input
+            <q-field
                 filled
                 v-model="state.charge.amount"
                 label="Monto"
-                maxlength="40"
-            />
+            >
+                <template v-slot:control="{ id, floatingLabel, modelValue, emitValue }">
+                    <input :id="id" class="q-field__input text-right" :value="modelValue" @change="e => emitValue(e.target.value)" v-money="vmoneyDirective" v-show="floatingLabel">
+                </template>
+            </q-field>
 
             <div class="botones">
                 <q-btn
@@ -49,11 +52,15 @@ import { db } from 'boot/firebase';
 import { useQuasar } from "quasar";
 import { reactive } from "@vue/reactivity";
 import { onMounted } from "@vue/runtime-core";
+import { VMoney } from 'v-money';
 
 export default {
     name: "FormsEditCharge",
     props: {
         chargeID: String
+    },
+    directives: {
+        money: VMoney
     },
     setup(props, context) {
         const $q = useQuasar();
@@ -63,13 +70,16 @@ export default {
             promptLocal: true,
             charge: {
                 chargeID: "",
-                amount: 0,
+                amount: null,
                 categoryID: "",
                 date: ""
-            }
+            },
+            categories: []
         });
 
         onMounted(async () => {
+            getCategories();
+
             await db.collection('Charges').doc(chargeID).get()
                 .then(response => {
                     state.charge = {
@@ -80,6 +90,16 @@ export default {
                     }
                 })
         });
+
+        let getCategories = async () => {
+            const response = await db.collection('Categories').get();
+            response.forEach(doc => {
+                state.categories.push({
+                    label: doc.data().Description,
+                    value: parseInt(doc.id)
+                })
+            });
+        }
 
         let formatter = date => {
             let d = new Date(date);
@@ -106,7 +126,16 @@ export default {
         return {
             state,
             onSubmit,
-            close
+            close,
+            vmoneyDirective :{
+                decimal: ',',
+                thousands: '.',
+                prefix: '€',
+                suffix: ' EUR',
+                precision: 2,
+                masked: false,
+                min: 0.00
+            }
         };
     },
 };
@@ -115,8 +144,13 @@ export default {
 <style lang="scss" scoped>
 .regular-form {
     background-color: white;
-    gap: 0;
     min-width: 90vw;
     padding: 2rem;
+}
+
+.botones{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
 }
 </style>

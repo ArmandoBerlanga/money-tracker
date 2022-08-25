@@ -9,3 +9,9 @@ h5 {
     border-radius: 0.5rem;
     padding: 0.7rem;
 }
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}

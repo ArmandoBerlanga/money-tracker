@@ -65,6 +65,9 @@ let getCharges = async () => {
 
 let toggleTheme = () => document.body.classList.toggle('body--dark');
 let formatter = date => new Date(date).toLocaleString('es-MX', { hour12: false }).replace(',', '').substring(0, 15);
+let formatterM = number => '€' + Number(parseFloat(number).toFixed(2)).toLocaleString("es-MX", {
+    minimumFractionDigits: 2
+});
 let findCategory = id => categories.value.find(category => category.categoryID == id).description;
 
 let timer;
@@ -159,7 +162,7 @@ getCharges();
                     <q-item class="info">
                         <div class="text-left">{{ formatter(charge.date) }}</div>
                         <div class="text-center">{{ findCategory(charge.categoryID) }}</div>
-                        <div class="text-right">€{{ charge.amount }}</div>
+                        <div class="text-right">{{ formatterM(charge.amount) }}</div>
                     </q-item>
                 </q-slide-item>
             </q-list>
