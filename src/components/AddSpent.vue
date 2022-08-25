@@ -10,7 +10,7 @@ const chargesStore = useChargeStore();
 
 const emit = defineEmits(['add'])
 
-let price = ref(0);
+let price = ref(null);
 let category = ref(null);
 let categories = ref([]);
 
@@ -44,7 +44,7 @@ let addSpent = async () => {
         return;
     }
 
-    if(price.value <= 0) {
+    if(price.value == null) {
         $q.notify({
             message: 'El precio debe ser mayor que 0',
             color: 'negative',
@@ -53,25 +53,27 @@ let addSpent = async () => {
         return;
     }
 
+    let amount = parseFloat(price.value.replace('€', '').replace(' EUR', '').replace('.', '').replace(',', '.'));
+
     const response = await db.collection('Charges').add({
-        Amount: parseFloat(price.value),
+        Amount: amount,
         CategoryID: parseInt(category.value),
         Date: new Date()
     });
 
     emit('add', {
-        amount: price.value,
+        amount: amount,
         categoryID: category.value,
     });
 
     chargesStore.addOne({
         chargeID: response.id,
-        amount: price.value,
+        amount: amount,
         categoryID: category.value,
         date: new Date().getTime()
     });
 
-    price.value = 0;
+    price.value = null;
     category.value = null;
 
     $q.notify({
@@ -97,17 +99,17 @@ getCategories();
             :options="categories"
             label="Categoría" />
 
-        <q-input
+
+        <q-field
             filled
             dense
             v-model="price"
-            v-money="vmoneyDirective"
-            label="Gasto"
-            mask="#.##"
-            fill-mask="0"
-            reverse-fill-mask
-            input-class="text-right" />
-
+            label="Monto"
+        >
+            <template v-slot:control="{ id, floatingLabel, modelValue, emitValue }">
+                <input :id="id" class="q-field__input text-right" :value="modelValue" @change="e => emitValue(e.target.value)" v-money="vmoneyDirective" v-show="floatingLabel">
+            </template>
+        </q-field>
 
         <q-btn
             color="primary"

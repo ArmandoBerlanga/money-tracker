@@ -5,11 +5,15 @@ import { useChargeStore } from 'stores/charge-store.js';
 import { useCategorieStore } from 'stores/categorie-store.js';
 import { useQuasar } from 'quasar';
 import { onBeforeUnmount } from '@vue/runtime-core';
+import EditCharge from 'components/EditCharge.vue';
 
 const $q = useQuasar()
 const chargesStore = useChargeStore();
 const categoriesStore = useCategorieStore();
 
+const noData = ref(true);
+const showEditCharge = ref(false);
+const editChargeID = ref("");
 const charges = ref([]);
 const categories = ref([]);
 
@@ -52,6 +56,8 @@ let getCharges = async () => {
     else
         charges.value = chargesStore.charges;
 
+    noData.value = charges.value.length == 0;
+
     charges.value = charges.value.sort((a, b) => {
         return b.date - a.date;
     });
@@ -64,34 +70,53 @@ let findCategory = id => categories.value.find(category => category.categoryID =
 let timer;
 let finalize = (reset) => timer = setTimeout(() => { reset() }, 1);
 
-let onLeft = async (reset, chargeID) => {
-    console.log('left', chargeID);
-    await db.collection('Charges').doc(chargeID).delete()
-        .then(() => {
-            chargesStore.remove(chargeID);
-            charges.value = chargesStore.charges;
+let onLeft = (reset, chargeID) => {
 
-            $q.notify({
-                message: 'Registro eliminado',
-                color: 'negative',
-                position: 'top',
-                timeout: 2000
-            });
-        })
-        .catch(error => {
-            $q.notify({
-                message: error,
-                color: 'negative',
-                position: 'top',
-                timeout: 2000
-            });
+    $q.dialog({
+        title: 'Estas por borrar un cargo',
+        message: '¿Estas seguro de borrar este cargo?',
+        ok: {
+          push: true,
+          color: 'grey',
+          label: 'Eliminar',
+        },
+        cancel: {
+          push: true,
+          color: 'primary',
+          label: 'Cancelar',
+        },
+    })
+        .onOk(async () => {
+            await db.collection('Charges').doc(chargeID).delete()
+                .then(() => {
+                    chargesStore.remove(chargeID);
+                    charges.value = chargesStore.charges;
+
+                    $q.notify({
+                        message: 'Cargo eliminado',
+                        color: 'negative',
+                        position: 'top',
+                        timeout: 2000
+                    });
+
+                    noData.value = charges.value.length == 0;
+                })
+                .catch(() => {
+                    $q.notify({
+                        message: 'Error al eliminar el cargo',
+                        color: 'negative',
+                        position: 'top',
+                        timeout: 2000
+                    });
+                });
         });
 
     finalize(reset);
 }
 
 let onRight = (reset, chargeID) => {
-    $q.notify('Right action triggered. Resetting in 1 second.')
+    showEditCharge.value = true;
+    editChargeID.value = chargeID;
     finalize(reset);
 }
 
@@ -110,35 +135,43 @@ getCharges();
         <h5 class="text-primary text-bold">Historial de cargos</h5>
     </div>
 
-    <div class="records container">
+    <div class="records container" v-if="!noData">
         <div class="titles">
             <div class="text-left">Fecha</div>
             <div class="text-center">Categoría</div>
             <div class="text-right">Monto</div>
         </div>
 
-        <q-list>
-            <q-slide-item class="record"
-                v-for="(charge, index) in charges" :key="index"
-                left-color="negative" right-color="positive"
-                @left="({reset}) => onLeft(reset, charge.chargeID)" @right="({reset}) => onRight(reset, charge.chargeID)"
-            >
-                <template v-slot:left>
-                    <q-icon name="delete" />
-                </template>
-                <template v-slot:right>
-                    <q-icon name="edit" />
-                </template>
+        <q-scroll-area style="height:80vh;">
+            <q-list>
+                <q-slide-item class="record"
+                    v-for="(charge, index) in charges" :key="index"
+                    left-color="negative" right-color="positive"
+                    @left="({reset}) => onLeft(reset, charge.chargeID)" @right="({reset}) => onRight(reset, charge.chargeID)"
+                >
+                    <template v-slot:left>
+                        <q-icon name="delete" />
+                    </template>
+                    <template v-slot:right>
+                        <q-icon name="edit" />
+                    </template>
 
-                <q-item class="info">
-                    <div class="text-left">{{ formatter(charge.date) }}</div>
-                    <div class="text-center">{{ findCategory(charge.categoryID) }}</div>
-                    <div class="text-right">€{{ charge.amount }}</div>
-                </q-item>
-            </q-slide-item>
-        </q-list>
+                    <q-item class="info">
+                        <div class="text-left">{{ formatter(charge.date) }}</div>
+                        <div class="text-center">{{ findCategory(charge.categoryID) }}</div>
+                        <div class="text-right">€{{ charge.amount }}</div>
+                    </q-item>
+                </q-slide-item>
+            </q-list>
+        </q-scroll-area>
     </div>
 
+    <div class="no-data container flex flex-center column q-gutter-y-sm prevent-selection" v-if="noData">
+        <q-icon name="sentiment_dissatisfied" size="4rem" color="primary"/>
+        <h5 class="text-primary q-pb-md">No has registrado ningun gasto</h5>
+    </div>
+
+    <EditCharge v-if="showEditCharge" :chargeID="editChargeID" @close="showEditCharge = false"/>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
             <q-fab-action color="grey" to="/" icon="home" />
