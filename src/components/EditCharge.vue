@@ -86,7 +86,7 @@ export default {
                 .then(response => {
                     state.charge = {
                         chargeID: response.id,
-                        amount: response.data().Amount * 100,
+                        amount: response.data().Amount.toFixed(2),
                         categoryID: response.data().CategoryID,
                         date: formatter(response.data().Date.seconds * 1000),
                     }

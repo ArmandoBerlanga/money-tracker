@@ -64,8 +64,12 @@ let getCharges = async () => {
 }
 
 let toggleTheme = () => document.body.classList.toggle('body--dark');
-let formatter = date => new Date(date).toLocaleString('es-MX', { hour12: false }).replace(',', '').substring(0, 15);
-let formatterM = number => '€' + Number(parseFloat(number).toFixed(2)).toLocaleString("es-MX", {
+let formatter = date => {
+    let d = new Date(date).toLocaleString('es-MX', { hour12: false });
+    return d.substring(0, d.length - 3).replace(',', '');
+}
+
+let formatterM = number => '€' + Number(parseFloat(number).toFixed(2)).toLocaleString("es-ES", {
     minimumFractionDigits: 2
 });
 let findCategory = id => categories.value.find(category => category.categoryID == id).description;
@@ -79,14 +83,13 @@ let onLeft = (reset, chargeID) => {
         title: 'Estas por borrar un cargo',
         message: '¿Estas seguro de borrar este cargo?',
         ok: {
-          push: true,
-          color: 'grey',
+          color: 'primary',
           label: 'Eliminar',
         },
         cancel: {
-          push: true,
           color: 'primary',
           label: 'Cancelar',
+          flat: true
         },
     })
         .onOk(async () => {

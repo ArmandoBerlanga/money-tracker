@@ -1,6 +1,6 @@
 <script setup>
 import { db } from 'boot/firebase';
-import AddSpent from 'components/AddSpent.vue';
+import AddCharge from 'components/AddCharge.vue';
 import PieChart from 'components/charts/PieChart.vue';
 import BarChart from 'components/charts/BarChart.vue';
 import { nextTick, onMounted, reactive } from '@vue/runtime-core';
@@ -156,7 +156,7 @@ onMounted(() => {
 <template>
 <q-page class="q-ma-sm q-my-md q-gutter-y-sm">
     <div class="forms container">
-        <AddSpent @add="addToTotal"/>
+        <AddCharge @add="addToTotal"/>
     </div>
 
     <div class="indicador container">
