@@ -3,7 +3,7 @@ import { db } from 'boot/firebase';
 import AddSpent from 'components/AddSpent.vue';
 import PieChart from 'components/charts/PieChart.vue';
 import BarChart from 'components/charts/BarChart.vue';
-import { nextTick, reactive } from '@vue/runtime-core';
+import { nextTick, onMounted, reactive } from '@vue/runtime-core';
 import { useChargeStore } from 'stores/charge-store.js';
 import { useCategorieStore } from 'stores/categorie-store.js';
 
@@ -79,6 +79,7 @@ let getCharges = async () =>{
     state.noData = state.totalSpent == 0;
 
     // Manipulación de datos para el gráfico de PIE
+    state.categories.forEach(category => category.total = 0);
     state.charges.forEach(charge => {
         let today = new Date();
         let chargeDate = new Date(charge.date);
@@ -132,7 +133,7 @@ let addToTotal = payload => {
     let col = state.barSeries.find(col => col.name == category.description);
     if(col)
         col.data[new Date().getMonth()] += payload.amount;
-    else{
+    else {
         let series = [];
         series[new Date().getMonth()] = payload.amount;
 
@@ -144,19 +145,12 @@ let addToTotal = payload => {
             data: series
         });
     }
-
-    chargesStore.addOne({
-        chargeID: '',
-        amount: payload.amount,
-        categoryID: payload.categoryID,
-        date: new Date().getTime()
-    });
 };
 
-// --
-
-getCategories();
-getCharges();
+onMounted(() => {
+    getCategories();
+    getCharges();
+});
 </script>
 
 <template>
@@ -187,7 +181,6 @@ getCharges();
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
-            <q-fab-action color="grey" to="/settings" icon="settings" />
             <q-fab-action color="grey" to="/records" icon="manage_search" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
         </q-fab>

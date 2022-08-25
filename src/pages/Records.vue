@@ -3,7 +3,10 @@ import { db } from 'boot/firebase';
 import { ref } from '@vue/reactivity';
 import { useChargeStore } from 'stores/charge-store.js';
 import { useCategorieStore } from 'stores/categorie-store.js';
+import { useQuasar } from 'quasar';
+import { onBeforeUnmount } from '@vue/runtime-core';
 
+const $q = useQuasar()
 const chargesStore = useChargeStore();
 const categoriesStore = useCategorieStore();
 
@@ -55,12 +58,49 @@ let getCharges = async () => {
 }
 
 let toggleTheme = () => document.body.classList.toggle('body--dark');
-let formatter = date => new Date(date).toLocaleString('es-MX', { hour12: false }).replace(',', '').substring(0, 14);
+let formatter = date => new Date(date).toLocaleString('es-MX', { hour12: false }).replace(',', '').substring(0, 15);
 let findCategory = id => categories.value.find(category => category.categoryID == id).description;
+
+let timer;
+let finalize = (reset) => timer = setTimeout(() => { reset() }, 1);
+
+let onLeft = async (reset, chargeID) => {
+    console.log('left', chargeID);
+    await db.collection('Charges').doc(chargeID).delete()
+        .then(() => {
+            chargesStore.remove(chargeID);
+            charges.value = chargesStore.charges;
+
+            $q.notify({
+                message: 'Registro eliminado',
+                color: 'negative',
+                position: 'top',
+                timeout: 2000
+            });
+        })
+        .catch(error => {
+            $q.notify({
+                message: error,
+                color: 'negative',
+                position: 'top',
+                timeout: 2000
+            });
+        });
+
+    finalize(reset);
+}
+
+let onRight = (reset, chargeID) => {
+    $q.notify('Right action triggered. Resetting in 1 second.')
+    finalize(reset);
+}
+
+onBeforeUnmount(() => {
+    clearTimeout(timer)
+})
 
 getCategories();
 getCharges();
-
 </script>
 
 <template>
@@ -70,33 +110,33 @@ getCharges();
         <h5 class="text-primary text-bold">Historial de cargos</h5>
     </div>
 
-    <div class="remove-charge container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Categoria</th>
-                    <th>Monto</th>
-                    <th>Editar</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(charge, index) in charges" :key="index">
-                    <td>{{ formatter(charge.date) }}</td>
-                    <td>{{ findCategory(charge.categoryID) }}</td>
-                    <td>€{{ charge.amount }}</td>
-                    <td>
-                        <q-btn
-                            round
-                            dense
-                            flat
-                            icon="edit"
-                            size="md"
-                            color="warning" />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="records container">
+        <div class="titles">
+            <div class="text-left">Fecha</div>
+            <div class="text-center">Categoría</div>
+            <div class="text-right">Monto</div>
+        </div>
+
+        <q-list>
+            <q-slide-item class="record"
+                v-for="(charge, index) in charges" :key="index"
+                left-color="negative" right-color="positive"
+                @left="({reset}) => onLeft(reset, charge.chargeID)" @right="({reset}) => onRight(reset, charge.chargeID)"
+            >
+                <template v-slot:left>
+                    <q-icon name="delete" />
+                </template>
+                <template v-slot:right>
+                    <q-icon name="edit" />
+                </template>
+
+                <q-item class="info">
+                    <div class="text-left">{{ formatter(charge.date) }}</div>
+                    <div class="text-center">{{ findCategory(charge.categoryID) }}</div>
+                    <div class="text-right">€{{ charge.amount }}</div>
+                </q-item>
+            </q-slide-item>
+        </q-list>
     </div>
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -109,51 +149,31 @@ getCharges();
 </template>
 
 <style lang="scss" scoped>
-table {
-    width: 100%;
-    height: 10px;
-    text-align: center;
-    border-collapse: collapse;
-    overflow: hidden;
-    border-radius: 5px;
+.q-item{
+    padding: 0 1.5rem;
+}
 
-    thead {
+.records{
+    .titles{
+        display: grid;
+        grid-template-columns: 1fr 0.9fr 0.8fr;
+        font-weight: bold;
         background-color: #4A7C59;
-        color: #fff;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px 5px 0 0;
     }
+    .record {
+        border-bottom: 1px solid #4a7c592b;
+        .info{
+            display: grid;
+            grid-template-columns: 1fr 0.9fr 0.8fr;
+            align-items: center;
+        }
 
-    tbody {
-        background-color: rgba(255, 255, 255, 0.587);
-
-        tr {
-            &:hover {
-                background-color: #4a7c591c;
-                cursor: pointer;
-            }
-
-            &:nth-of-type(2n) {
-                background-color: #c2c6c31a;
-                cursor: pointer;
-
-                &:hover {
-                    background-color: #4a7c591c;
-                }
-            }
-
-            &:last-of-type {
-                border-bottom: 2px solid #4A7C59;
-            }
+        &:last-child{
+            border-radius: 0 0 5px 5px;
         }
     }
-
-    th,
-    td {
-        padding: 0.2rem;
-        width: 27.5%;
-        &:last-child {
-            width: 17.5%;
-        }
-    }
-
 }
 </style>

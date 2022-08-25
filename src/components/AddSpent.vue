@@ -3,8 +3,10 @@ import { VMoney } from 'v-money';
 import { db } from 'boot/firebase';
 import { useQuasar } from 'quasar';
 import { ref } from '@vue/runtime-core';
+import { useChargeStore } from 'stores/charge-store.js';
 
 const $q = useQuasar();
+const chargesStore = useChargeStore();
 
 const emit = defineEmits(['add'])
 
@@ -60,6 +62,13 @@ let addSpent = async () => {
     emit('add', {
         amount: price.value,
         categoryID: category.value,
+    });
+
+    chargesStore.addOne({
+        chargeID: response.id,
+        amount: price.value,
+        categoryID: category.value,
+        date: new Date().getTime()
     });
 
     price.value = 0;

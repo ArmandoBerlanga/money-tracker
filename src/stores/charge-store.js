@@ -12,6 +12,9 @@ export const useChargeStore = defineStore('chaarges', {
     },
     addOne(input) {
       this.charges.push(input);
+    },
+    remove (id) {
+      this.charges = this.charges.filter((charge) => charge.chargeID !== id);
     }
   },
 });
