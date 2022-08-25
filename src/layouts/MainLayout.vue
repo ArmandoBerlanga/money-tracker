@@ -1,3 +1,17 @@
+<script setup>
+import { onMounted } from '@vue/runtime-core';
+
+
+onMounted(() => {
+    var hr = (new Date()).getHours();
+    if ((hr >= 0 && hr <= 7) || (hr >= 19 && hr < 24))
+        document.body.classList.add('body--dark');
+    else
+        document.body.classList.remove('body--dark');
+});
+
+</script>
+
 <template>
 <q-layout view="lHh Lpr lFf">
     <q-header elevated>
