@@ -123,6 +123,11 @@ let onRight = (reset, chargeID) => {
     finalize(reset);
 }
 
+let updCharges = () => {
+    charges.value = chargesStore.charges;
+    noData.value = charges.value.length == 0;
+}
+
 onBeforeUnmount(() => {
     clearTimeout(timer)
 })
@@ -174,7 +179,7 @@ getCharges();
         <h5 class="text-primary q-pb-md">No has registrado ningun gasto</h5>
     </div>
 
-    <EditCharge v-if="showEditCharge" :chargeID="editChargeID" @close="showEditCharge = false"/>
+    <EditCharge v-if="showEditCharge" :chargeID="editChargeID" @close="showEditCharge = false" @update="updCharges"/>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
             <q-fab-action color="grey" to="/" icon="home" />

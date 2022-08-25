@@ -15,6 +15,13 @@ export const useChargeStore = defineStore('chaarges', {
     },
     remove (id) {
       this.charges = this.charges.filter((charge) => charge.chargeID !== id);
+    },
+    update (charge) {
+        this.charges = this.charges.map((c) => {
+            if (c.chargeID === charge.chargeID)
+                return charge;
+            return c;
+        });
     }
   },
 });

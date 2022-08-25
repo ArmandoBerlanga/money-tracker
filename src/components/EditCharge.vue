@@ -53,6 +53,7 @@ import { useQuasar } from "quasar";
 import { reactive } from "@vue/reactivity";
 import { onMounted } from "@vue/runtime-core";
 import { VMoney } from 'v-money';
+import { useChargeStore } from 'stores/charge-store.js';
 
 export default {
     name: "FormsEditCharge",
@@ -65,6 +66,7 @@ export default {
     setup(props, context) {
         const $q = useQuasar();
         const chargeID = props.chargeID;
+        const chargesStore = useChargeStore();
 
         const state = reactive({
             promptLocal: true,
@@ -84,7 +86,7 @@ export default {
                 .then(response => {
                     state.charge = {
                         chargeID: response.id,
-                        amount: response.data().Amount,
+                        amount: response.data().Amount * 100,
                         categoryID: response.data().CategoryID,
                         date: formatter(response.data().Date.seconds * 1000),
                     }
@@ -115,7 +117,33 @@ export default {
             return [year, month, day].join('-');
         }
 
-        function onSubmit() {
+        async function onSubmit() {
+            let amount = parseFloat(state.charge.amount.replace('€', '').replace(' EUR', '').replace('.', '').replace(',', '.'));
+
+            await db.collection('Charges').doc(chargeID).update({
+                Amount: amount,
+                CategoryID: state.charge.categoryID,
+                Date: new Date(state.charge.date)
+            })
+                .then(() => {
+                    $q.notify({
+                        message: 'Actualizado correctamente',
+                        color: 'positive',
+                        icon: 'check_circle',
+                        position: 'top'
+                    });
+                    chargesStore.update({...state.charge, amount});
+                    context.emit("update", false);
+                })
+                .catch(() => {
+                    $q.notify({
+                        message: 'Error al actualizar',
+                        color: 'negative',
+                        icon: 'error',
+                        position: 'top'
+                    });
+                });
+
             context.emit("close", true);
         }
 
