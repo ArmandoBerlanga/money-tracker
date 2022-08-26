@@ -16,7 +16,7 @@ onMounted(() => {
 <q-layout view="lHh Lpr lFf">
     <q-header elevated>
         <q-toolbar class="flex flex-center">
-            <router-link to="/" class="no-link">
+            <router-link to="/index" class="no-link">
                 <q-toolbar-title class="flex flex-center home">
                     <img src="~assets/icon.png" alt="main-icon" style="width:50px;">
                     <div id="title" class="text-bold text-italic">Money Tracker</div>

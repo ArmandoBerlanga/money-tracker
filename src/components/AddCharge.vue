@@ -44,7 +44,9 @@ let addSpent = async () => {
         return;
     }
 
-    if(price.value == null) {
+    price.value = parseFloat(price.value.replace('€', '').replace(' EUR', '').replace('.', '').replace(',', '.'));
+
+    if(price.value == null || price.value == 0) {
         $q.notify({
             message: 'El precio debe ser mayor que 0',
             color: 'negative',
@@ -53,23 +55,21 @@ let addSpent = async () => {
         return;
     }
 
-    let amount = parseFloat(price.value.replace('€', '').replace(' EUR', '').replace('.', '').replace(',', '.'));
-
     const response = await db.collection('Charges').add({
         UserID: localStorage.getItem('UserID'),
-        Amount: amount,
+        Amount: price.value,
         CategoryID: parseInt(category.value),
         Date: new Date()
     });
 
     emit('add', {
-        amount: amount,
+        amount: price.value,
         categoryID: category.value,
     });
 
     chargesStore.addOne({
         chargeID: response.id,
-        amount: amount,
+        amount: price.value,
         categoryID: category.value,
         date: new Date().getTime()
     });

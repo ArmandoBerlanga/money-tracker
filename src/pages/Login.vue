@@ -2,8 +2,11 @@
 import { useQuasar } from 'quasar';
 import { db } from 'boot/firebase';
 import { ref } from '@vue/reactivity';
+import { useRouter } from 'vue-router';
+import { route } from 'quasar/wrappers';
 
-const $q = useQuasar()
+const $q = useQuasar();
+const router = useRouter();
 
 let name = ref(null);
 let users = ref([]);
@@ -33,7 +36,7 @@ let onSubmit = () => {
     }
 
     localStorage.setItem('UserID', userID);
-    location.replace('/index');
+    router.push('/index');
 };
 
 getUsers();

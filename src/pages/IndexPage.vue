@@ -1,12 +1,14 @@
 <script setup>
 import { db } from 'boot/firebase';
+import { useRouter } from 'vue-router';
 import AddCharge from 'components/AddCharge.vue';
 import PieChart from 'components/charts/PieChart.vue';
 import BarChart from 'components/charts/BarChart.vue';
-import { nextTick, onMounted, reactive } from '@vue/runtime-core';
 import { useChargeStore } from 'stores/charge-store.js';
 import { useCategorieStore } from 'stores/categorie-store.js';
+import { nextTick, onMounted, reactive } from '@vue/runtime-core';
 
+const router = useRouter();
 const chargesStore = useChargeStore();
 const categoriesStore = useCategorieStore();
 
@@ -20,32 +22,35 @@ const state = reactive({
     noData: true
 });
 
-let formatter = number => '€' + Number(parseFloat(number).toFixed(2)).toLocaleString("es-MX", {
-    minimumFractionDigits: 2
-}) + ' EUR';
+function formatter(number) {
+    return '€' + Number(parseFloat(number).toFixed(2)).toLocaleString("es-MX", {
+        minimumFractionDigits: 2
+    }) + ' EUR';
+}
 
-const forceRerender = async () => {
+async function forceRerender() {
     state.renderCharts = false;
     await nextTick();
     state.renderCharts = true;
 };
 
-let toggleTheme = () => {
+function toggleTheme() {
     document.body.classList.toggle('body--dark');
     forceRerender();
 };
 
-let logout = () => {
+function logOut() {
     localStorage.clear();
-    location.replace('/');
+    chargesStore.$reset();
+    categoriesStore.$reset();
+    router.push('/');
 };
 
-let getCategories = async () => {
+async function getCategories() {
+    state.categories = categoriesStore.categories;
 
-    if(categoriesStore.categories.length != 0){
-        state.categories = categoriesStore.categories;
+    if(state.categories.length != 0)
         return;
-    }
 
     await db.collection('Categories').get()
         .then(response => {
@@ -58,36 +63,12 @@ let getCategories = async () => {
             });
 
             categoriesStore.set(state.categories);
-        })
+        });
 }
 
-let getCharges = async () =>{
-
-    if(chargesStore.charges.length == 0)
-        await db.collection('Charges').get()
-            .then(response => {
-                response.forEach(doc => {
-                    state.charges.push({
-                        chargeID: doc.id,
-                        userID: doc.data().UserID,
-                        amount: doc.data().Amount,
-                        categoryID: doc.data().CategoryID,
-                        date: doc.data().Date.seconds * 1000,
-                    });
-
-                    state.charges = state.charges.filter(charge => charge.userID == localStorage.getItem('UserID'));
-                });
-
-                chargesStore.set(state.charges);
-            });
-    else
-        state.charges = chargesStore.charges;
-
-    state.totalSpent = state.charges.reduce((acc, cur) => acc + cur.amount, 0);
-    state.noData = state.totalSpent == 0;
-
-    // Manipulación de datos para el gráfico de PIE
+function getPieSeries(){
     state.categories.forEach(category => category.total = 0);
+
     state.charges.forEach(charge => {
         let today = new Date();
         let chargeDate = new Date(charge.date);
@@ -97,8 +78,11 @@ let getCharges = async () =>{
     });
 
     state.pieSeries = state.categories.flatMap(category => category.total);
+}
 
-    // Manipulación de datos para el gráfico de BARRAS
+function getBarSeries(){
+    state.barSeries = [];
+
     let byCategory = state.charges.reduce((acc, charge) => {
         if(!acc[charge.categoryID])
             acc[charge.categoryID] = [];
@@ -127,6 +111,35 @@ let getCharges = async () =>{
             data: Object.values(charges)
         });
     });
+}
+
+async function getCharges() {
+
+    if(chargesStore.charges.length == 0)
+        await db.collection('Charges').get()
+            .then(response => {
+                response.forEach(doc => {
+                    state.charges.push({
+                        chargeID: doc.id,
+                        userID: doc.data().UserID,
+                        amount: doc.data().Amount,
+                        categoryID: doc.data().CategoryID,
+                        date: doc.data().Date.seconds * 1000,
+                    });
+
+                    state.charges = state.charges.filter(charge => charge.userID == localStorage.getItem('UserID'));
+                });
+
+                chargesStore.set(state.charges);
+            });
+    else
+        state.charges = chargesStore.charges;
+
+    state.totalSpent = state.charges.reduce((acc, cur) => acc + cur.amount, 0);
+    state.noData = state.totalSpent == 0;
+
+    getPieSeries();
+    getBarSeries();
 }
 
 let addToTotal = payload => {
@@ -191,7 +204,7 @@ onMounted(() => {
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
             <q-fab-action color="grey" to="/records" icon="manage_search" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
-            <q-fab-action color="grey" @click="logout" icon="logout" />
+            <q-fab-action color="grey" @click="logOut" icon="logout" />
         </q-fab>
     </q-page-sticky>
 </q-page>
