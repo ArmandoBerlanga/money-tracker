@@ -9,12 +9,11 @@ body.body--dark {
     * {
         color: inherit;
     }
-    input,
-    .q-checkbox__svg {
-        color: white;
+    .q-slide-item {
+        background: rgba(128, 128, 128, 0.378);
     }
-    tbody {
-        background-color: rgba(21, 21, 21, 0.409) !important;
+    .record .info{
+        background-color: $dk-escala-3 !important;
     }
     .q-chip,
     .q-item {
@@ -24,7 +23,7 @@ body.body--dark {
     .q-card {
         background-color: $dk-escala-2 !important;
     }
-    .q-menu,
+    .q-menu, .q-select__dialog > *,
     .q-card .q-field__control,
     .regular-form .q-field__control {
         background-color: $dk-escala-3 !important;
