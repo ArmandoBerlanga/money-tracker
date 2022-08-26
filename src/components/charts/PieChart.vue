@@ -1,5 +1,4 @@
 <script setup>
-import { db } from 'boot/firebase';
 import { onMounted, ref } from '@vue/runtime-core';
 import { useCategorieStore } from 'stores/categorie-store.js';
 
@@ -58,12 +57,7 @@ const options = ref({
 
 onMounted(async () => {
     options.value.theme.mode = document.body.classList.contains('body--dark') || localStorage.getItem('tema') == 1 ? 'dark' : 'light';
-
-    if(categoriesStore.categories.length != 0)
-        options.value.labels = categoriesStore.getDescriptions;
-    else
-        await db.collection('Categories').get()
-            .then(response => response.forEach(doc => options.value.labels.push(doc.data().Description)));
+    options.value.labels = categoriesStore.getDescriptions;
 })
 </script>
 

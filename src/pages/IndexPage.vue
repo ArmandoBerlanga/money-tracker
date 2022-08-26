@@ -16,6 +16,7 @@ const state = reactive({
     categories: [],
     charges: [],
     pieSeries:[],
+    pieLabels:[],
     barSeries: [],
     totalSpent: 0,
     renderCharts: true,
@@ -91,7 +92,7 @@ function getBarSeries(){
         return acc;
     }, {});
 
-    Object.keys(byCategory).forEach(key => {
+    let byDate = Object.keys(byCategory).map(key => {
         let charges = byCategory[key]
             .reduce((acc, charge) => {
                 let month = new Date(charge.date).getMonth();
@@ -106,10 +107,17 @@ function getBarSeries(){
         for(let i = 0; i < 12; i++)
             if(!charges[i]) charges[i] = 0;
 
-        state.barSeries.push({
-            name: state.categories.find(category => category.categoryID == key).description,
-            data: Object.values(charges)
-        });
+        return {
+            key,
+            charges
+        }
+    });
+
+    state.barSeries = state.categories.map(c => {
+        return {
+            name: c.description,
+            data: Object.values(byDate.find(b => b.key == c.categoryID)?.charges ?? {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0})
+        }
     });
 }
 
@@ -145,27 +153,13 @@ async function getCharges() {
 let addToTotal = payload => {
     state.noData = false;
     payload.amount = parseFloat(payload.amount);
-    state.totalSpent += payload.amount;
 
     let category = state.categories.find(category => payload.categoryID == category.categoryID);
     category.total += payload.amount;
 
+    state.totalSpent += payload.amount;
     state.pieSeries = state.categories.flatMap(category => category.total);
-    let col = state.barSeries.find(col => col.name == category.description);
-    if(col)
-        col.data[new Date().getMonth()] += payload.amount;
-    else {
-        let series = [];
-        series[new Date().getMonth()] = payload.amount;
-
-        for(let i = 0; i < 12; i++)
-            if(!series[i]) series[i] = 0;
-
-        state.barSeries.push({
-            name: category.description,
-            data: series
-        });
-    }
+    state.barSeries.find(col => col.name == category.description).data[new Date().getMonth()] += payload.amount;
 };
 
 onMounted(() => {
