@@ -3,7 +3,7 @@ import { onMounted } from '@vue/runtime-core';
 
 
 onMounted(() => {
-    var hr = (new Date()).getHours();
+    let hr = (new Date()).getHours();
     if ((hr >= 0 && hr <= 7) || (hr >= 19 && hr < 24))
         document.body.classList.add('body--dark');
     else

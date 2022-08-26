@@ -56,6 +56,7 @@ let addSpent = async () => {
     let amount = parseFloat(price.value.replace('€', '').replace(' EUR', '').replace('.', '').replace(',', '.'));
 
     const response = await db.collection('Charges').add({
+        UserID: localStorage.getItem('UserID'),
         Amount: amount,
         CategoryID: parseInt(category.value),
         Date: new Date()

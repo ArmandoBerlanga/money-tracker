@@ -45,10 +45,13 @@ let getCharges = async () => {
                 response.forEach(doc => {
                     charges.value.push({
                         chargeID: doc.id,
+                        userID: doc.data().UserID,
                         amount: doc.data().Amount,
                         categoryID: doc.data().CategoryID,
                         date: doc.data().Date.seconds * 1000,
-                    })
+                    });
+
+                    charges.value = charges.value.filter(charge => charge.userID == localStorage.getItem('UserID'));
                 });
 
                 chargesStore.set(charges.value);
@@ -185,7 +188,7 @@ getCharges();
     <EditCharge v-if="showEditCharge" :chargeID="editChargeID" @close="showEditCharge = false" @update="updCharges"/>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
-            <q-fab-action color="grey" to="/" icon="home" />
+            <q-fab-action color="grey" to="/index" icon="home" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
         </q-fab>
     </q-page-sticky>

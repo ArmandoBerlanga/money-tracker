@@ -35,6 +35,11 @@ let toggleTheme = () => {
     forceRerender();
 };
 
+let logout = () => {
+    localStorage.clear();
+    location.replace('/');
+};
+
 let getCategories = async () => {
 
     if(categoriesStore.categories.length != 0){
@@ -64,10 +69,13 @@ let getCharges = async () =>{
                 response.forEach(doc => {
                     state.charges.push({
                         chargeID: doc.id,
+                        userID: doc.data().UserID,
                         amount: doc.data().Amount,
                         categoryID: doc.data().CategoryID,
                         date: doc.data().Date.seconds * 1000,
-                    })
+                    });
+
+                    state.charges = state.charges.filter(charge => charge.userID == localStorage.getItem('UserID'));
                 });
 
                 chargesStore.set(state.charges);
@@ -183,6 +191,7 @@ onMounted(() => {
         <q-fab color="primary" icon="keyboard_arrow_up" direction="up">
             <q-fab-action color="grey" to="/records" icon="manage_search" />
             <q-fab-action color="grey" @click="toggleTheme" icon="dark_mode" />
+            <q-fab-action color="grey" @click="logout" icon="logout" />
         </q-fab>
     </q-page-sticky>
 </q-page>
