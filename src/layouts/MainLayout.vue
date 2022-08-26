@@ -1,15 +1,13 @@
 <script setup>
 import { onMounted } from '@vue/runtime-core';
 
-
 onMounted(() => {
-    let hr = (new Date()).getHours();
-    if ((hr >= 0 && hr <= 7) || (hr >= 19 && hr < 24))
-        document.body.classList.add('body--dark');
-    else
+    let hr = new Date().getHours();
+    if (hr >= 8 && hr <= 17)
         document.body.classList.remove('body--dark');
+    else
+        document.body.classList.add('body--dark');
 });
-
 </script>
 
 <template>
